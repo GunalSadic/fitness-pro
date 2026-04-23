@@ -14,7 +14,7 @@ export default function QRScreen({ navigation }: any) {
           <Text style={styles.headerSubtitle}>GYM ENTRY</Text>
           <Text style={styles.headerTitle}>Your QR Code</Text>
         </View>
-        <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.goBack()}>
           <X color="#000" size={20} />
         </TouchableOpacity>
       </View>
