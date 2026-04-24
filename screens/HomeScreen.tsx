@@ -48,19 +48,7 @@ export default function HomeScreen({ navigation }: any) {
           <Text style={styles.primaryBtnText}>Show My QR Code</Text>
         </TouchableOpacity>
 
-        {/* Secondary Action */}
-        <TouchableOpacity style={styles.secondaryBtn}>
-          <View style={styles.secondaryBtnLeft}>
-            <View style={styles.iconContainer}>
-              <UserIcon size={20} color="#000" />
-            </View>
-            <View>
-              <Text style={styles.secondaryBtnTitle}>View profile</Text>
-              <Text style={styles.secondaryBtnSubtitle}>Account & details</Text>
-            </View>
-          </View>
-          <ChevronRight size={20} color="#888" />
-        </TouchableOpacity>
+       
       </ScrollView>
     </SafeAreaView>
   );
