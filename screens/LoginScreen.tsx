@@ -1,11 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen({ navigation }: any) {
-  const { login } = useAuth();
+  const { login, isLoading, error } = useAuth();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const handleLogin = async () => {
+    if (!email || !password) return;
+    
+    const result = await login(email, password);
+    if (result?.isSuccess) {
+      // Change 'Home' to your main app screen name (e.g. '(tabs)', 'MainTabs', 'Dashboard', etc.)
+      // Using replace() so user can't go back to login screen
+      navigation.replace('Home');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -28,6 +40,7 @@ export default function LoginScreen({ navigation }: any) {
               onChangeText={setEmail}
               autoCapitalize="none"
               keyboardType="email-address"
+              editable={!isLoading}
             />
           </View>
 
@@ -39,16 +52,26 @@ export default function LoginScreen({ navigation }: any) {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
+              editable={!isLoading}
             />
           </View>
+
+          {error && <Text style={styles.errorText}>{error}</Text>}
 
           <TouchableOpacity style={styles.forgotBtn} onPress={() => navigation.navigate('ForgotPassword')}>
             <Text style={styles.forgotText}>Forgot password?</Text>
           </TouchableOpacity>
 
-          {/* This currently bypasses real auth and just logs you in! */}
-          <TouchableOpacity style={styles.primaryBtn} onPress={login}>
-            <Text style={styles.primaryBtnText}>Sign In</Text>
+          <TouchableOpacity 
+            style={[styles.primaryBtn, isLoading && styles.primaryBtnDisabled]} 
+            onPress={handleLogin}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={styles.primaryBtnText}>Sign In</Text>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -72,12 +95,36 @@ const styles = StyleSheet.create({
   form: { gap: 20 },
   inputGroup: { gap: 8 },
   label: { fontSize: 14, fontWeight: '500', color: '#333' },
-  input: { height: 50, borderWidth: 1, borderColor: '#ddd', borderRadius: 12, paddingHorizontal: 16, backgroundColor: '#fff', fontSize: 16 },
+  input: { 
+    height: 50, 
+    borderWidth: 1, 
+    borderColor: '#ddd', 
+    borderRadius: 12, 
+    paddingHorizontal: 16, 
+    backgroundColor: '#fff', 
+    fontSize: 16 
+  },
   forgotBtn: { alignSelf: 'flex-end' },
   forgotText: { color: '#666', fontSize: 14, fontWeight: '500' },
-  primaryBtn: { backgroundColor: '#000', height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginTop: 10 },
+  primaryBtn: { 
+    backgroundColor: '#000', 
+    height: 56, 
+    borderRadius: 16, 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginTop: 10 
+  },
+  primaryBtnDisabled: {
+    backgroundColor: '#666',
+  },
   primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 40 },
   footerText: { color: '#666', fontSize: 14 },
-  footerLink: { color: '#000', fontSize: 14, fontWeight: 'bold' }
+  footerLink: { color: '#000', fontSize: 14, fontWeight: 'bold' },
+  errorText: { 
+    color: '#ff3b5c', 
+    fontSize: 14, 
+    textAlign: 'center',
+    marginTop: 8 
+  },
 });

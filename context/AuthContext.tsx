@@ -1,31 +1,97 @@
-import React, { createContext, useState, useContext } from 'react';
+// context/AuthContext.tsx
+import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authService, AuthResponse } from '../services/AuthService';
 
-type AuthContextType = {
+interface AuthContextType {
   isAuthenticated: boolean;
-  login: () => void;
-  logout: () => void;
-};
+  token: string | null;
+  isLoading: boolean;
+  error: string | null;
+  login: (email: string, password: string) => Promise<AuthResponse>;
+  register: (fullName: string, email: string, password: string) => Promise<AuthResponse>;
+  logout: () => Promise<void>;
+}
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // Start as false so the user sees the Login screen first
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const login = () => setIsAuthenticated(true);
-  const logout = () => setIsAuthenticated(false);
+  // Load token on app start
+  useEffect(() => {
+    const loadToken = async () => {
+      const storedToken = await AsyncStorage.getItem('authToken');
+      if (storedToken) {
+        setToken(storedToken);
+        setIsAuthenticated(true);
+      }
+      setIsLoading(false);
+    };
+    loadToken();
+  }, []);
+
+  const login = async (email: string, password: string): Promise<AuthResponse> => {
+    setError(null);
+    const result = await authService.login(email, password);
+    if (result.isSuccess && result.token) {
+      await AsyncStorage.setItem('authToken', result.token);
+      setToken(result.token);
+      setIsAuthenticated(true);
+    } else {
+      setError(result.message);
+    }
+    return result;
+  };
+
+  const register = async (fullName: string, email: string, password: string): Promise<AuthResponse> => {
+    setError(null);
+    const result = await authService.register(fullName, email, password);
+    if (result.isSuccess && result.token) {
+      await AsyncStorage.setItem('authToken', result.token);
+      setToken(result.token);
+      setIsAuthenticated(true);
+    } else {
+      setError(result.message);
+    }
+    return result;
+  };
+
+  const logout = async () => {
+    await AsyncStorage.removeItem('authToken');
+    setToken(null);
+    setIsAuthenticated(false);
+    setError(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider 
+      value={{ 
+        isAuthenticated, 
+        token, 
+        isLoading, 
+        error, 
+        login, 
+        register, 
+        logout 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
+/**
+ * Custom hook to use the auth context
+ * (This is what your LoginScreen and RegisterScreen were importing)
+ */
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}
+};
