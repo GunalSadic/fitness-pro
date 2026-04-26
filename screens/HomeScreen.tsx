@@ -1,54 +1,60 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
-import { CheckCircle2, XCircle, QrCode, User as UserIcon, ChevronRight } from 'lucide-react-native';
+import { CheckCircle2, XCircle, QrCode } from 'lucide-react-native';
+import { useAuth } from '../context/AuthContext';
 
 export default function HomeScreen({ navigation }: any) {
-  // Mocking the auth context from your web app
-  const active = true;
-  const days = 14;
-  const endDate = "Oct 15, 2024";
+  const { user, subscription } = useAuth();
+
+  const active = subscription?.isActive ?? false;
+  const days = subscription?.daysRemaining ?? 0;
+  const endDate = subscription?.endDate
+    ? new Date(subscription.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : '—';
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
           <Text style={styles.subtitle}>Welcome back</Text>
-          <Text style={styles.title}>Hi, Gunal 👋</Text>
+          <Text style={styles.title}>Hi, {user?.fullName ?? 'there'} 👋</Text>
         </View>
 
-        {/* Membership Status Card */}
-        <View style={[styles.card, active ? styles.cardActive : styles.cardExpired]}>
-          <View style={[styles.badge, active ? styles.badgeActive : styles.badgeExpired]}>
-            {active ? <CheckCircle2 size={14} color="#16a34a" /> : <XCircle size={14} color="#dc2626" />}
-            <Text style={[styles.badgeText, active ? { color: '#16a34a' } : { color: '#dc2626' }]}>
-              {active ? "Active" : "Expired"}
-            </Text>
+        {subscription === null ? (
+          <View style={[styles.card, styles.cardExpired]}>
+            <Text style={styles.cardSubtitle}>Loading subscription...</Text>
           </View>
-          
-          <Text style={styles.cardSubtitle}>
-            {active ? "Membership active" : "Membership expired on"}
-          </Text>
-          <Text style={styles.cardTitle}>{endDate}</Text>
-          
-          {active ? (
-            <Text style={styles.cardSubtitle}>{days} days remaining</Text>
-          ) : (
-            <TouchableOpacity style={styles.renewBtn}>
-              <Text style={styles.renewBtnText}>Renew membership</Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        ) : (
+          <View style={[styles.card, active ? styles.cardActive : styles.cardExpired]}>
+            <View style={[styles.badge, active ? styles.badgeActive : styles.badgeExpired]}>
+              {active ? <CheckCircle2 size={14} color="#16a34a" /> : <XCircle size={14} color="#dc2626" />}
+              <Text style={[styles.badgeText, active ? { color: '#16a34a' } : { color: '#dc2626' }]}>
+                {active ? "Active" : "Expired"}
+              </Text>
+            </View>
 
-        {/* Primary CTA */}
-        <TouchableOpacity 
+            <Text style={styles.cardSubtitle}>
+              {active ? "Membership active" : "Membership expired on"}
+            </Text>
+            <Text style={styles.cardTitle}>{endDate}</Text>
+
+            {active ? (
+              <Text style={styles.cardSubtitle}>{days} days remaining</Text>
+            ) : (
+              <TouchableOpacity style={styles.renewBtn}>
+                <Text style={styles.renewBtnText}>Renew membership</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
+        <TouchableOpacity
           style={styles.primaryBtn}
           onPress={() => navigation.navigate('QR')}
         >
           <QrCode color="#fff" size={20} />
           <Text style={styles.primaryBtnText}>Show My QR Code</Text>
         </TouchableOpacity>
-
-       
       </ScrollView>
     </SafeAreaView>
   );
@@ -77,5 +83,5 @@ const styles = StyleSheet.create({
   secondaryBtnLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   iconContainer: { width: 40, height: 40, backgroundColor: '#f4f4f5', borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   secondaryBtnTitle: { fontSize: 14, fontWeight: '500' },
-  secondaryBtnSubtitle: { fontSize: 12, color: '#888' }
+  secondaryBtnSubtitle: { fontSize: 12, color: '#888' },
 });

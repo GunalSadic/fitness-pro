@@ -11,3 +11,11 @@ export const AUTH_ENDPOINTS = {
   REGISTER: '/api/auth/register',
   LOGIN: '/api/auth/login',
 };
+
+export const SUBSCRIPTION_ENDPOINTS = {
+  SUBSCRIPTION: '/api/subscription/me',
+};
+
+export const STATS_ENDPOINTS = {
+  STATS: '/api/stats/me',
+};

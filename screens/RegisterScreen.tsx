@@ -12,11 +12,7 @@ export default function RegisterScreen({ navigation }: any) {
   const handleRegister = async () => {
     if (!name || !email || !password) return;
     
-    const result = await register(name, email, password);
-    if (result?.isSuccess) {
-      // Change 'Home' to your main app screen name (e.g. '(tabs)', 'MainTabs', 'Dashboard', etc.)
-      navigation.replace('Home');
-    }
+    await register(name, email, password);
   };
 
   return (
