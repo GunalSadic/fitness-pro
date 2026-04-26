@@ -4,8 +4,13 @@ import { User, CreditCard, Bell, LogOut, ChevronRight } from 'lucide-react-nativ
 import { useAuth } from '../context/AuthContext';
 
 export default function ProfileScreen() {
-  const { logout } = useAuth();
-  const user = { name: "Alex Doe", email: "alex@example.com", memberSince: "Oct 2023" };
+  // 1. Pull both logout and user from your context
+  const { logout, user } = useAuth(); 
+
+  // 2. Safely fallback just in case the context is still loading
+  const displayName = user?.fullName || "User";
+  const displayEmail = user?.email || "";
+  const initial = displayName.charAt(0).toUpperCase();
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -15,11 +20,11 @@ export default function ProfileScreen() {
         {/* User Info Card */}
         <View style={styles.userCard}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{user.name.charAt(0)}</Text>
+            <Text style={styles.avatarText}>{initial}</Text>
           </View>
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>{user.name}</Text>
-            <Text style={styles.userEmail}>{user.email}</Text>
+            <Text style={styles.userName}>{displayName}</Text>
+            <Text style={styles.userEmail}>{displayEmail}</Text>
           </View>
         </View>
 
@@ -41,7 +46,6 @@ export default function ProfileScreen() {
           <Text style={styles.logoutText}>Log out</Text>
         </TouchableOpacity>
 
-        <Text style={styles.memberSince}>Member since {user.memberSince}</Text>
       </ScrollView>
     </SafeAreaView>
   );

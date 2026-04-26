@@ -2,10 +2,13 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { X } from 'lucide-react-native';
+import { useAuth } from '../context/AuthContext';
 
 export default function QRScreen({ navigation }: any) {
-  const active = true;
-  const payload = JSON.stringify({ uid: "user@test.com", ts: Date.now() });
+  const { user, subscription } = useAuth();
+
+  const active = subscription?.isActive ?? false;
+  const payload = JSON.stringify({ uid: user?.id ?? '', ts: Date.now() });
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -21,11 +24,11 @@ export default function QRScreen({ navigation }: any) {
 
       <View style={styles.content}>
         <View style={styles.qrContainer}>
-          <QRCode 
-            value={payload} 
-            size={220} 
-            color="#0a0a0a" 
-            backgroundColor="#ffffff" 
+          <QRCode
+            value={payload}
+            size={220}
+            color="#0a0a0a"
+            backgroundColor="#ffffff"
           />
         </View>
 
@@ -34,8 +37,8 @@ export default function QRScreen({ navigation }: any) {
       </View>
 
       <View style={[styles.statusBanner, active ? styles.statusActive : styles.statusExpired]}>
-        <View style={[styles.statusDot, active ? {backgroundColor: '#16a34a'} : {backgroundColor: '#dc2626'}]} />
-        <Text style={[styles.statusText, active ? {color: '#16a34a'} : {color: '#dc2626'}]}>
+        <View style={[styles.statusDot, active ? { backgroundColor: '#16a34a' } : { backgroundColor: '#dc2626' }]} />
+        <Text style={[styles.statusText, active ? { color: '#16a34a' } : { color: '#dc2626' }]}>
           {active ? "Membership active" : "Membership expired"}
         </Text>
       </View>
@@ -46,7 +49,7 @@ export default function QRScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fafafa', justifyContent: 'space-between' },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 24 },
-  headerSubtitle: { fontSize: 10, color: '#888', fontWeight: 'bold', letterSpacing: 1 }, // <-- Fixed here
+  headerSubtitle: { fontSize: 10, color: '#888', fontWeight: 'bold', letterSpacing: 1 },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   closeBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#fff', borderWidth: 1, borderColor: '#eee', alignItems: 'center', justifyContent: 'center' },
   content: { alignItems: 'center', justifyContent: 'center', flex: 1 },
@@ -57,5 +60,5 @@ const styles = StyleSheet.create({
   statusActive: { backgroundColor: '#f0fdf4', borderColor: '#bbf7d0' },
   statusExpired: { backgroundColor: '#fef2f2', borderColor: '#fecaca' },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
-  statusText: { fontSize: 14, fontWeight: '600' }
+  statusText: { fontSize: 14, fontWeight: '600' },
 });

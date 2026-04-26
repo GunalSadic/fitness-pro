@@ -11,12 +11,7 @@ export default function LoginScreen({ navigation }: any) {
   const handleLogin = async () => {
     if (!email || !password) return;
     
-    const result = await login(email, password);
-    if (result?.isSuccess) {
-      // Change 'Home' to your main app screen name (e.g. '(tabs)', 'MainTabs', 'Dashboard', etc.)
-      // Using replace() so user can't go back to login screen
-      navigation.replace('Home');
-    }
+    await login(email, password);
   };
 
   return (
