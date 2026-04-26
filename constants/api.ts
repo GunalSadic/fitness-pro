@@ -19,3 +19,8 @@ export const SUBSCRIPTION_ENDPOINTS = {
 export const STATS_ENDPOINTS = {
   STATS: '/api/stats/me',
 };
+
+export const GOALS_ENDPOINTS = {
+  GOAL: '/api/goals/me',
+  ACHIEVEMENTS: '/api/goals/achievements',
+};

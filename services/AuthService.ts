@@ -1,4 +1,4 @@
-import { API_BASE_URL, AUTH_ENDPOINTS, SUBSCRIPTION_ENDPOINTS, STATS_ENDPOINTS } from '../constants/api';
+import { API_BASE_URL, AUTH_ENDPOINTS, SUBSCRIPTION_ENDPOINTS, STATS_ENDPOINTS, GOALS_ENDPOINTS } from '../constants/api';
 
 export interface AuthResponse {
   isSuccess: boolean;
@@ -17,6 +17,18 @@ export interface SubscriptionDto {
   startDate: string | null;
   endDate: string | null;
   daysRemaining: number | null;
+}
+
+export interface GoalDto {
+  weeklyGoal: number;
+}
+
+export interface AchievementDto {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  isUnlocked: boolean;
 }
 
 export const authService = {
@@ -41,10 +53,7 @@ export const authService = {
   async getStats(token: string): Promise<StatsDto> {
     const response = await fetch(`${API_BASE_URL}${STATS_ENDPOINTS.STATS}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Authorization': `Bearer ${token}` },
     });
     return response.json();
   },
@@ -52,10 +61,34 @@ export const authService = {
   async getSubscription(token: string): Promise<SubscriptionDto> {
     const response = await fetch(`${API_BASE_URL}${SUBSCRIPTION_ENDPOINTS.SUBSCRIPTION}`, {
       method: 'GET',
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    return response.json();
+  },
+
+  async getGoal(token: string): Promise<GoalDto> {
+    const response = await fetch(`${API_BASE_URL}${GOALS_ENDPOINTS.GOAL}`, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    return response.json();
+  },
+
+  async setGoal(token: string, weeklyGoal: number): Promise<void> {
+    await fetch(`${API_BASE_URL}${GOALS_ENDPOINTS.GOAL}`, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
+      body: JSON.stringify({ weeklyGoal }),
+    });
+  },
+
+  async getAchievements(token: string): Promise<AchievementDto[]> {
+    const response = await fetch(`${API_BASE_URL}${GOALS_ENDPOINTS.ACHIEVEMENTS}`, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${token}` },
     });
     return response.json();
   },

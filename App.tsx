@@ -2,7 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Home, LayoutDashboard, QrCode, User } from 'lucide-react-native';
+import { Home, LayoutDashboard, Target, User } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import ProfileScreen from './screens/ProfileScreen';
@@ -12,6 +12,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 // Screens
 import HomeScreen from './screens/HomeScreen';
 import StatsScreen from './screens/StatsScreen';
+import GoalsScreen from './screens/GoalsScreen';
 import QRScreen from './screens/QRScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
@@ -33,13 +34,14 @@ function MainTabs() {
         tabBarIcon: ({ color }) => {
           if (route.name === 'Home') return <Home color={color} size={24} />;
           if (route.name === 'Stats') return <LayoutDashboard color={color} size={24} />;
+          if (route.name === 'Goals') return <Target color={color} size={24} />;
           if (route.name === 'Profile') return <User color={color} size={24} />;
         },
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Stats" component={StatsScreen} />
-      {/* REMOVED THE QR TAB SCREEN HERE */}
+      <Tab.Screen name="Goals" component={GoalsScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
